@@ -11,34 +11,30 @@ export default function Workspace() {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative">
-      {/* Mobile Top Ad */}
-      <AdSense 
+      <AdSense
         className="portrait:flex landscape:hidden w-full h-20 shrink-0 border-b border-white/5" 
         slot="mobile-top"
       />
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Side Ad (Desktop) */}
-        <AdSense 
+        <AdSense
           className="hidden landscape:flex w-24 shrink-0 border-r border-white/5" 
           slot="left-sidebar-ad"
         />
 
         <LeftSidebar />
-        
+
         <CenterCanvas activeSection={activeSection} />
-        
+
         <RightSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
 
-        {/* Right Side Ad (Desktop) */}
-        <AdSense 
+        <AdSense
           className="hidden landscape:flex w-24 shrink-0 border-l border-white/5" 
           slot="right-sidebar-ad"
         />
       </div>
 
-      {/* Mobile Bottom Ad */}
-      <AdSense 
+      <AdSense
         className="portrait:flex landscape:hidden w-full h-20 shrink-0 border-t border-white/5" 
         slot="mobile-bottom"
       />

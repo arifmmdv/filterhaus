@@ -76,7 +76,7 @@ export default function CenterCanvas({ activeSection }: { activeSection?: string
 
   const cropStyle: React.CSSProperties = !isCropView && present.crop ? {
     clipPath: `inset(${present.crop.y}% ${100 - (present.crop.x + present.crop.width)}% ${100 - (present.crop.y + present.crop.height)}% ${present.crop.x}%)`,
-    transform: `scale(${100 / present.crop.width}, ${100 / present.crop.height})`,
+    transform: `scale(${Math.min(100 / present.crop.width, 100 / present.crop.height)})`,
     transformOrigin: `${present.crop.x + present.crop.width / 2}% ${present.crop.y + present.crop.height / 2}%`,
   } : {};
 
