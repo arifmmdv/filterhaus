@@ -80,6 +80,14 @@ export interface Adjustments {
   grain: number;
 }
 
+export interface CropArea {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  unit: "px" | "%";
+}
+
 /** The present state of the editor at any point in time */
 export interface EditorSnapshot {
   filterId: string;
@@ -90,6 +98,8 @@ export interface EditorSnapshot {
   /** Populated only when filterType === "lut" */
   lutPath: string;
   adjustments: Adjustments;
+  crop?: CropArea;
+  aspectRatio?: number;
 }
 
 /** Full editor store state */
@@ -116,6 +126,8 @@ export interface EditorActions {
   applyCssFilter: (filterId: string, cssFilter: string) => void;
   applyLutFilter: (filterId: string, lutPath: string) => void;
   updateAdjustment: (key: keyof Adjustments, value: number) => void;
+  setCrop: (crop: CropArea | undefined) => void;
+  setAspectRatio: (ratio: number | undefined) => void;
   setLutResult: (filterId: string, dataUrl: string) => void;
   setLutLoading: (filterId: string, loading: boolean) => void;
   undo: () => void;

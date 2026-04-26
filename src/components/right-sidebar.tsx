@@ -53,12 +53,17 @@ const TOOL_GROUPS = [
 // =============================================================================
 // Right Sidebar
 // =============================================================================
-export default function RightSidebar() {
+export default function RightSidebar({ 
+  activeSection, 
+  setActiveSection 
+}: { 
+  activeSection: string; 
+  setActiveSection: (s: string) => void;
+}) {
   const present = useEditorStore((s) => s.present);
   const showOriginal = useEditorStore((s) => s.showOriginal);
   const originalImage = useEditorStore((s) => s.originalImage);
 
-  const [activeSection, setActiveSection] = useState<string>("filters");
   const [exportOpen, setExportOpen] = useState(false);
 
   // Determine if current filter is pro (look it up from config or fallback)
@@ -394,21 +399,47 @@ function LutFilterButton({
 }
 
 // =============================================================================
-// Crop Section (Visual Only)
+// Crop Section
 // =============================================================================
+const ASPECT_RATIOS = [
+  { label: "Free", value: undefined },
+  { label: "1:1", value: 1 / 1 },
+  { label: "4:5", value: 4 / 5 },
+  { label: "3:4", value: 3 / 4 },
+  { label: "2:3", value: 2 / 3 },
+  { label: "9:16", value: 9 / 16 },
+  { label: "5:4", value: 5 / 4 },
+  { label: "4:3", value: 4 / 3 },
+  { label: "3:2", value: 3 / 2 },
+  { label: "16:9", value: 16 / 9 },
+];
+
 function CropSection() {
+  const aspectRatio = useEditorStore((s) => s.present.aspectRatio);
+  const setAspectRatio = useEditorStore((s) => s.setAspectRatio);
+
   return (
     <div className="space-y-4">
       <h3 className="text-[11px] uppercase tracking-widest text-white/30 font-semibold">
-        Crop
+        Aspect Ratio
       </h3>
-      <div className="flex flex-col items-center gap-3 py-8 text-white/20">
-        <Crop className="w-10 h-10" />
-        <p className="text-xs text-center">
-          Crop tool coming soon.
-          <br />
-          This feature is under development.
-        </p>
+      <div className="grid grid-cols-3 gap-2">
+        {ASPECT_RATIOS.map((ratio) => (
+          <button
+            key={ratio.label}
+            onClick={() => setAspectRatio(ratio.value)}
+            className={`
+              py-2 px-1 rounded-lg text-[10px] font-medium transition-all
+              ${
+                aspectRatio === ratio.value
+                  ? "bg-white text-black"
+                  : "bg-white/5 text-white/60 hover:bg-white/10"
+              }
+            `}
+          >
+            {ratio.label}
+          </button>
+        ))}
       </div>
     </div>
   );

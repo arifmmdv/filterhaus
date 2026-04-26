@@ -63,17 +63,47 @@ export default function ExportModal({ open, onClose }: ExportModalProps) {
         ctx.filter = combinedFilter;
       }
 
+      // Draw image (with filter applied)
       ctx.drawImage(img, 0, 0);
 
-      // Reset filter after drawing so it doesn't affect subsequent draws if any
+      // Reset filter
       ctx.filter = "none";
 
-      const link = document.createElement("a");
-      link.download = `photo-studio-export.png`;
-      link.href = canvas.toDataURL("image/png", 1.0);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Apply crop if exists
+      if (present.crop) {
+        const { x, y, width, height } = present.crop;
+        // Since crop is in %, convert to pixels
+        const pixelX = (x / 100) * img.naturalWidth;
+        const pixelY = (y / 100) * img.naturalHeight;
+        const pixelW = (width / 100) * img.naturalWidth;
+        const pixelH = (height / 100) * img.naturalHeight;
+
+        // Create a new canvas for the cropped result
+        const cropCanvas = document.createElement("canvas");
+        cropCanvas.width = pixelW;
+        cropCanvas.height = pixelH;
+        const cropCtx = cropCanvas.getContext("2d")!;
+        
+        cropCtx.drawImage(
+          canvas, 
+          pixelX, pixelY, pixelW, pixelH, // source
+          0, 0, pixelW, pixelH // destination
+        );
+
+        const link = document.createElement("a");
+        link.download = `photo-studio-export.png`;
+        link.href = cropCanvas.toDataURL("image/png", 1.0);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        const link = document.createElement("a");
+        link.download = `photo-studio-export.png`;
+        link.href = canvas.toDataURL("image/png", 1.0);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     };
     img.src = imageSrc;
 

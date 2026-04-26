@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { EditorStore, EditorSnapshot, Adjustments } from "@/types";
+import { EditorStore, EditorSnapshot, Adjustments, CropArea } from "@/types";
 
 // =============================================================================
 // Defaults
@@ -104,6 +104,20 @@ export const useEditorStore = create<EditorStore>()(
             future: [],
           };
         }),
+
+      setCrop: (crop: CropArea | undefined) =>
+        set((state) => ({
+          past: [...state.past, state.present],
+          present: { ...state.present, crop },
+          future: [],
+        })),
+
+      setAspectRatio: (aspectRatio: number | undefined) =>
+        set((state) => ({
+          past: [...state.past, state.present],
+          present: { ...state.present, aspectRatio },
+          future: [],
+        })),
 
       /** Cache a rendered LUT result */
       setLutResult: (filterId: string, dataUrl: string) =>
