@@ -8,7 +8,7 @@
         { "id": "none", "label": "None", "cssFilter": "none", "isPro": false },
         { "id": "grayscale", "label": "Grayscale", "cssFilter": "grayscale(100%)", "isPro": false },
         { "id": "moody", "label": "Moody", "cssFilter": "saturate(0.6) contrast(1.35) brightness(0.8) sepia(0.15)", "isPro": false },
-        { "id": "happy", "label": "Happy", "cssFilter": "saturate(1.4) brightness(1.1) contrast(1.05) hue-rotate(10deg)", "isPro": true }
+        { "id": "happy", "label": "Happy", "cssFilter": "saturate(1.4) brightness(1.1) contrast(1.05) hue-rotate(10deg)", "isPro": false }
       ]
     },
     {
@@ -21,6 +21,25 @@
         { "id": "fhf03", "label": "Fashion 03", "path": "filters/fashion/FHF03.cube", "isPro": false },
         { "id": "fhf04", "label": "Fashion 04", "path": "filters/fashion/FHF04.cube", "isPro": false },
         { "id": "fhf05", "label": "Fashion 05", "path": "filters/fashion/FHF05.cube", "isPro": false }
+      ]
+    },
+    {
+      "id": "travel",
+      "name": "Travel",
+      "type": "lut",
+      "filters": [
+        { "id": "fht01", "label": "Travel 01", "path": "filters/travel/FHT01.cube", "isPro": false },
+        { "id": "fht02", "label": "Travel 02", "path": "filters/travel/FHT02.cube", "isPro": false }
+      ]
+    },
+    {
+      "id": "aesthetic-vintage",
+      "name": "Aesthetic Vintage",
+      "type": "lut",
+      "filters": [
+        { "id": "afl1", "label": "Film Lover 1", "path": "filters/aesthetic-vintage/aesthetic-film-lover-1.cube", "isPro": true },
+        { "id": "afl2", "label": "Film Lover 2", "path": "filters/aesthetic-vintage/aesthetic-film-lover-2.cube", "isPro": true },
+        { "id": "afl3", "label": "Film Lover 3", "path": "filters/aesthetic-vintage/aesthetic-film-lover-3.cube", "isPro": true }
       ]
     }
   ]

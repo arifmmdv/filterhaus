@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Download, Crown, X } from "lucide-react";
 import { useEditorStore } from "@/store/editor-store";
-import { getFilterById } from "@/config/filters";
+import { getFilterConfig, findFilterInConfig } from "@/config/filters";
+import { FilterConfig } from "@/types";
 
 interface ExportModalProps {
   open: boolean;
@@ -13,38 +14,65 @@ interface ExportModalProps {
 export default function ExportModal({ open, onClose }: ExportModalProps) {
   const originalImage = useEditorStore((s) => s.originalImage);
   const present = useEditorStore((s) => s.present);
+  const lutImageCache = useEditorStore((s) => s.lutImageCache);
 
-  const activeFilter = getFilterById(present.filterId);
+  const [config, setConfig] = useState<FilterConfig | null>(null);
+
+  useEffect(() => {
+    getFilterConfig().then(setConfig).catch(console.error);
+  }, []);
+
+  const filterMeta = config ? findFilterInConfig(config, present.filterId) : null;
+  const filterName = filterMeta?.label || (present.filterId === "none" ? "None" : present.filterId);
+  const isPro = filterMeta?.isPro || false;
 
   const handleDownload = useCallback(() => {
     if (!originalImage) return;
 
     // Log isPro status
-    if (activeFilter.isPro) {
+    if (isPro) {
       console.log(
-        `[Photo Studio] Exporting with Pro filter: "${activeFilter.name}". Payment gating not yet implemented.`
+        `[Photo Studio] Exporting with Pro filter: "${filterName}". Payment gating not yet implemented.`
       );
     }
 
+    // Determine which image source to use
+    const isLut = present.filterType === "lut";
+    const imageSrc = (isLut ? lutImageCache[present.filterId] : originalImage) || originalImage;
+
     // Create an off-screen canvas to bake the CSS filter into pixels
     const img = new Image();
+    img.crossOrigin = "anonymous";
     img.onload = () => {
       const canvas = document.createElement("canvas");
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
       const ctx = canvas.getContext("2d")!;
-      ctx.filter = activeFilter.cssFilter;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Only apply CSS filter if it's not a LUT filter (LUT is already baked in the cached image)
+      if (!isLut && present.cssFilter && present.cssFilter !== "none") {
+        ctx.filter = present.cssFilter;
+      }
+
       ctx.drawImage(img, 0, 0);
+
+      // Reset filter after drawing so it doesn't affect subsequent draws if any
+      ctx.filter = "none";
 
       const link = document.createElement("a");
       link.download = `photo-studio-export.png`;
-      link.href = canvas.toDataURL("image/png");
+      link.href = canvas.toDataURL("image/png", 1.0);
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     };
-    img.src = originalImage;
+    img.src = imageSrc;
 
     onClose();
-  }, [originalImage, activeFilter, onClose]);
+  }, [originalImage, present, lutImageCache, filterName, isPro, onClose]);
 
   if (!open) return null;
 
@@ -78,11 +106,11 @@ export default function ExportModal({ open, onClose }: ExportModalProps) {
         </div>
 
         {/* Pro filter badge */}
-        {activeFilter.isPro && (
+        {isPro && (
           <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg mb-4">
             <Crown className="w-4 h-4 text-amber-500 shrink-0" />
             <span className="text-xs text-amber-200/80">
-              This export uses the <strong>{activeFilter.name}</strong> Pro
+              This export uses the <strong>{filterName}</strong> Pro
               filter.
             </span>
           </div>
