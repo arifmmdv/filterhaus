@@ -24,12 +24,30 @@ import {
 } from "@/types";
 
 // =============================================================================
-// Tool sliders config (visual only for v1)
+// Tool sliders config
 // =============================================================================
 const TOOL_GROUPS = [
-  { label: "Light", tools: ["Exposure", "Contrast", "Fade"] },
-  { label: "Color", tools: ["Saturation", "Skin Tone", "Temperature", "Tint"] },
-  { label: "Effects", tools: ["Grain"] },
+  {
+    label: "Light",
+    tools: [
+      { id: "exposure", label: "Exposure", min: -100, max: 100 },
+      { id: "contrast", label: "Contrast", min: -100, max: 100 },
+      { id: "fade", label: "Fade", min: 0, max: 100 },
+    ],
+  },
+  {
+    label: "Color",
+    tools: [
+      { id: "saturation", label: "Saturation", min: -100, max: 100 },
+      { id: "skinTone", label: "Skin Tone", min: -100, max: 100 },
+      { id: "temperature", label: "Temperature", min: -100, max: 100 },
+      { id: "tint", label: "Tint", min: -100, max: 100 },
+    ],
+  },
+  {
+    label: "Effects",
+    tools: [{ id: "grain", label: "Grain", min: 0, max: 100 }],
+  },
 ];
 
 // =============================================================================
@@ -301,8 +319,11 @@ function LutFilterButton({
     if (!previewImage || thumbnail) return;
 
     let cancelled = false;
-    setLoading(true);
-
+    
+    // Use a small delay to avoid "Calling setState synchronously within an effect" warning
+    // or better, just start the async operation which will set loading to false when done.
+    // We can assume it's loading if we have previewImage but no thumbnail.
+    
     renderThumbnailWithLut(previewImage, filter.path)
       .then((result) => {
         if (!cancelled) {
@@ -417,10 +438,12 @@ function ToolGroup({
   disabled,
 }: {
   label: string;
-  tools: string[];
+  tools: { id: string; label: string; min: number; max: number }[];
   disabled: boolean;
 }) {
   const [open, setOpen] = useState(true);
+  const adjustments = useEditorStore((s) => s.present.adjustments);
+  const updateAdjustment = useEditorStore((s) => s.updateAdjustment);
 
   return (
     <div>
@@ -437,22 +460,33 @@ function ToolGroup({
       </button>
       {open && (
         <div className="space-y-3">
-          {tools.map((tool) => (
-            <div key={tool} className={disabled ? "opacity-30" : ""}>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-white/50">{tool}</span>
-                <span className="text-[10px] text-white/25 tabular-nums">0</span>
+          {tools.map((tool) => {
+            const val = adjustments[tool.id as keyof typeof adjustments] ?? 0;
+            return (
+              <div key={tool.id} className={disabled ? "opacity-30" : ""}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-white/50">{tool.label}</span>
+                  <span className="text-[10px] text-white/25 tabular-nums">
+                    {val > 0 ? `+${val}` : val}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={tool.min}
+                  max={tool.max}
+                  value={val}
+                  onChange={(e) =>
+                    updateAdjustment(
+                      tool.id as keyof typeof adjustments,
+                      parseInt(e.target.value)
+                    )
+                  }
+                  disabled={disabled}
+                  className="studio-slider w-full"
+                />
               </div>
-              <input
-                type="range"
-                min="-100"
-                max="100"
-                defaultValue={0}
-                disabled={disabled}
-                className="studio-slider w-full"
-              />
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -87,6 +87,24 @@ export const useEditorStore = create<EditorStore>()(
           };
         }),
 
+      /** Update a single adjustment value */
+      updateAdjustment: (key: keyof Adjustments, value: number) =>
+        set((state) => {
+          const newAdjustments = {
+            ...state.present.adjustments,
+            [key]: value,
+          };
+          const newSnapshot: EditorSnapshot = {
+            ...state.present,
+            adjustments: newAdjustments,
+          };
+          return {
+            past: [...state.past, state.present],
+            present: newSnapshot,
+            future: [],
+          };
+        }),
+
       /** Cache a rendered LUT result */
       setLutResult: (filterId: string, dataUrl: string) =>
         set((state) => ({

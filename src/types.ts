@@ -110,11 +110,12 @@ export interface EditorState {
   lutLoading: Set<string>;
 }
 
-/** Actions available on the editor store */
+  /** Actions available on the editor store */
 export interface EditorActions {
   setImage: (dataUrl: string) => void;
   applyCssFilter: (filterId: string, cssFilter: string) => void;
   applyLutFilter: (filterId: string, lutPath: string) => void;
+  updateAdjustment: (key: keyof Adjustments, value: number) => void;
   setLutResult: (filterId: string, dataUrl: string) => void;
   setLutLoading: (filterId: string, loading: boolean) => void;
   undo: () => void;

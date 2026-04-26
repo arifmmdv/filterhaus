@@ -3,6 +3,7 @@
 import React, { useEffect, useCallback } from "react";
 import { useEditorStore } from "@/store/editor-store";
 import { renderImageWithLut } from "@/lib/lut-engine";
+import { getCombinedFilter } from "@/lib/filters";
 
 export default function CenterCanvas() {
   const originalImage = useEditorStore((s) => s.originalImage);
@@ -52,8 +53,12 @@ export default function CenterCanvas() {
     ? lutResult
     : originalImage;
 
-  const cssFilter =
-    showOriginal || isLut ? "none" : present.cssFilter || "none";
+  const cssFilter = showOriginal
+    ? "none"
+    : getCombinedFilter(
+        present.filterType === "lut" ? "none" : present.cssFilter,
+        present.adjustments
+      );
 
   return (
     <div className="flex-1 flex items-center justify-center p-6 min-w-0 overflow-hidden">

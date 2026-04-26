@@ -5,6 +5,7 @@ import { Download, Crown, X } from "lucide-react";
 import { useEditorStore } from "@/store/editor-store";
 import { getFilterConfig, findFilterInConfig } from "@/config/filters";
 import { FilterConfig } from "@/types";
+import { getCombinedFilter } from "@/lib/filters";
 
 interface ExportModalProps {
   open: boolean;
@@ -52,9 +53,14 @@ export default function ExportModal({ open, onClose }: ExportModalProps) {
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Only apply CSS filter if it's not a LUT filter (LUT is already baked in the cached image)
-      if (!isLut && present.cssFilter && present.cssFilter !== "none") {
-        ctx.filter = present.cssFilter;
+      // Apply combined filter (Preset + Adjustments)
+      const combinedFilter = getCombinedFilter(
+        present.filterType === "lut" ? "none" : present.cssFilter,
+        present.adjustments
+      );
+
+      if (combinedFilter !== "none") {
+        ctx.filter = combinedFilter;
       }
 
       ctx.drawImage(img, 0, 0);
